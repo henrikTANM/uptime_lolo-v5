@@ -32,6 +32,7 @@ export const testApi = async (rssUrl: string) => {
         });
 
         // Sort articles by publish date latest to oldest
+        // @ts-ignore
         articles.sort((a, b) => b.pubDate - a.pubDate);
 
         return articles;
