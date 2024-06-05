@@ -1,19 +1,24 @@
 "use server"
 
-import { parse } from 'node-html-parser';
-export const testApi = async (rssUrl: string) => {
 
+import {XMLParser} from "fast-xml-parser";
 
+const MERCURY_API = 'https://uptime-mercury-api.azurewebsites.net/webparser';
+
+// Fetch feed from input URL
+export const fetchRSSFeed = async (rssUrl: string) => {
     try {
         const response = await fetch(rssUrl, {
-            method: "GET"
+            method: "GET",
+            cache: "no-cache"
         });
-        const xml = parse(await response.text());
+        const parser = new XMLParser();
+        const xml = parser.parse(await response.text());
+        console.log(xml.channel.item);
 
-        const channelElement = xml.querySelector('channel > title');
-        const channel = channelElement ? channelElement.textContent : 'No Channel Title';
+        const channelElement = xml.channel.title;
 
-        const items = xml.querySelectorAll('item');
+        const items = xml.channel.item;
 
         // Create Array of articles with selected items from feed items
         const articles = Array.from(items).map(item => {
@@ -23,7 +28,6 @@ export const testApi = async (rssUrl: string) => {
             return {
                 feedTitle: channel,
                 title: item.querySelector('title')?.textContent || 'No Title',
-                link: item.querySelector('link')?.textContent || 'No Link',
                 description: item.querySelector('description')?.textContent || 'No Description',
                 pubDate: new Date(item.querySelector('pubDate')?.textContent || Date.now()),
                 categories: Array.from(item.querySelectorAll('category')).map(cat => cat.textContent),
@@ -41,4 +45,39 @@ export const testApi = async (rssUrl: string) => {
         return [];
     }
 }
+
+// Validate input URL
+export const validateRSSFeed = async (rssUrl: string) => {
+    try {
+        const response = await fetch(rssUrl,{
+            method: "GET",
+            cache: "no-cache"
+        });
+        const xml = parse(response.data);
+        return !!(xml.querySelector('rss') || xml.querySelector('feed')); // Check for RSS or Atom feeds
+    } catch (error) {
+        return false;
+    }
+};
+
+// Fetch cleaned content from article link using POST method
+export const fetchArticleContent = async (articleUrl: string) => {
+    try {
+        const response = await fetch(MERCURY_API, { url: articleUrl }, {
+            method: 'POST',
+            cache: "no-cache",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log("LOÖ");
+        console.log(articleUrl);
+        console.log(response);
+        const data = await response.json();
+        return data.content;
+    } catch (error) {
+        console.error('Error fetching article content:', error);
+        return 'Failed to fetch content';
+    }
+};
 

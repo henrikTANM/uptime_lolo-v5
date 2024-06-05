@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "domparser": "^0.1.1",
+    "dompurify": "^3.1.5",
+    "fast-xml-parser": "^4.4.0",
     "next": "14.2.3",
     "node-html-parser": "^6.1.13",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-modal": "^3.16.1"
   },
   "devDependencies": {
     "@types/node": "^20",
