@@ -10,7 +10,7 @@ const TestComponent = async  () => {
 
     return (
         <div>
-            {feeds.map((feed, index) => <div>{feed.title}</div>)}
+            {feeds.map((feed, index) => <div key={index}>{feed.title}</div>)}
         </div>
     )
 }
