@@ -3,12 +3,15 @@
 import { useState, useEffect } from "react";
 
 import { fetchRSSFeed, fetchArticleContent} from "@/api";
+// @ts-ignore
 import Modal from "react-modal";
 
+// @ts-ignore
 const RSSFeed = ({ feedUrl, removeFeed }) => {
     const [articles, setArticles] = useState([]);
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
+    // @ts-ignore
     const [removedArticles, setRemovedArticles] = useState(JSON.parse(sessionStorage.getItem(`removedArticles_${feedUrl}`)) || []);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [currentArticleContent, setCurrentArticleContent] = useState('');
@@ -20,15 +23,17 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
             console.log(feedUrl);
             const items = await fetchRSSFeed(feedUrl);
             if (items.length > 0) {
+                // @ts-ignore
                 setFeedTitle(items[0].feedTitle);
-            } else {
-
             }
+            // @ts-ignore
             setArticles(items);
 
             const uniqueCategories = Array.from(
+                // @ts-ignore
                 new Set(items.flatMap(item => item.categories))
             );
+            // @ts-ignore
             setCategories(uniqueCategories);
         };
 
@@ -41,7 +46,7 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
     }, [removedArticles, feedUrl]);
 
     // open modal to view articles
-    const openModal = async (url) => {
+    const openModal = async (url: string) => {
         setModalIsOpen(true);
         const content = await fetchArticleContent(url);
         setCurrentArticleContent(content);
@@ -54,13 +59,15 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
     };
 
     // remove article
-    const removeArticle = (link) => {
+    const removeArticle = (link: any) => {
         setRemovedArticles([...removedArticles, link]);
     };
 
     // filter out removed articles and articles with different categories than selected category
     const filteredItems = selectedCategory
+        // @ts-ignore
         ? articles.filter(item => item.categories.includes(selectedCategory) && !removedArticles.includes(item.link))
+        // @ts-ignore
         : articles.filter(item => !removedArticles.includes(item.link));
 
     return (
@@ -88,16 +95,21 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
                 {filteredItems.map((item, index) => (
                     <li key={index}>
                         <div className="article">
-                            {item.imageUrl && <img className="articleImage" src={item.imageUrl} alt={item.title}
-                                                   onClick={() => openModal(item.link)}/>}
+
+                            {// @ts-ignore
+                                item.imageUrl && <img className="articleImage" src={item.imageUrl} alt={item.title} onClick={() => openModal(item.link)}/>}
                             <div className="articleContent">
                                 <div className="textContent">
-                                    <h4 className="articleTitle" onClick={() => openModal(item.link)}>{item.title}</h4>
-                                    <p onClick={() => openModal(item.link)} style={{cursor: 'pointer', color: "#171238"}}>{item.description}</p>
+                                    <h4 className="articleTitle" onClick={// @ts-ignore
+                                        () => openModal(item.link)}>{item.title}</h4>
+                                    <p onClick={// @ts-ignore
+                                        () => openModal(item.link)} style={{cursor: 'pointer', color: "#171238"}}>{item.description}</p>
                                 </div>
                                 <div className="articleFooter">
-                                    <p><small>{item.pubDate.toLocaleDateString()}</small></p>
-                                    <button onClick={() => removeArticle(item.link)}>Remove</button>
+                                    <p><small>{// @ts-ignore
+                                        item.pubDate.toLocaleDateString()}</small></p>
+                                    <button onClick={// @ts-ignore
+                                        () => removeArticle(item.link)}>Remove</button>
                                 </div>
                             </div>
                         </div>

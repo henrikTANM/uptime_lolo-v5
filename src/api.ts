@@ -1,9 +1,9 @@
 "use server"
 
-
 import {XMLParser} from "fast-xml-parser";
 
 const MERCURY_API = 'https://uptime-mercury-api.azurewebsites.net/webparser';
+const Parser = new XMLParser({ ignoreAttributes : false, attributeNamePrefix : "@_", allowBooleanAttributes: true });
 
 // Fetch feed from input URL
 export const fetchRSSFeed = async (rssUrl: string) => {
@@ -12,28 +12,25 @@ export const fetchRSSFeed = async (rssUrl: string) => {
             method: "GET",
             cache: "no-cache"
         });
-        const parser = new XMLParser();
-        const xml = parser.parse(await response.text());
-        console.log(xml.channel.item);
-
-        const channelElement = xml.channel.title;
-
-        const items = xml.channel.item;
+        const json = Parser.parse(await response.text());
+        const channel = json.rss.channel
+        const feedTitle = channel.title;
+        const items = channel.item;
 
         // Create Array of articles with selected items from feed items
-        const articles = Array.from(items).map(item => {
-            const mediaContent = item.querySelector('media\\:content, content');
-            const enclosure = item.querySelector('enclosure');
-            const imageUrl = mediaContent?.getAttribute('url') || enclosure?.getAttribute('url') || '';
+        // @ts-ignore
+        const articles = Array.from(items.map(item => {
+            const imageUrl = item['media:content']?.['@_url'] || item.enclosure?.['@_url'] || '';
             return {
-                feedTitle: channel,
-                title: item.querySelector('title')?.textContent || 'No Title',
-                description: item.querySelector('description')?.textContent || 'No Description',
-                pubDate: new Date(item.querySelector('pubDate')?.textContent || Date.now()),
-                categories: Array.from(item.querySelectorAll('category')).map(cat => cat.textContent),
-                imageUrl
+                feedTitle: feedTitle,
+                title: item.title,
+                link: item.link,
+                description: item.description,
+                pubDate: new Date(item.pubDate),
+                categories: item.categories,
+                imageUrl: imageUrl,
             };
-        });
+        }));
 
         // Sort articles by publish date latest to oldest
         // @ts-ignore
@@ -53,9 +50,10 @@ export const validateRSSFeed = async (rssUrl: string) => {
             method: "GET",
             cache: "no-cache"
         });
-        const xml = parse(response.data);
-        return !!(xml.querySelector('rss') || xml.querySelector('feed')); // Check for RSS or Atom feeds
+        const json = Parser.parse(await response.text());
+        return json.rss ? true : false; // Check for RSS or Atom feeds
     } catch (error) {
+        console.error('Error validating RSS feed:', error);
         return false;
     }
 };
@@ -63,16 +61,12 @@ export const validateRSSFeed = async (rssUrl: string) => {
 // Fetch cleaned content from article link using POST method
 export const fetchArticleContent = async (articleUrl: string) => {
     try {
-        const response = await fetch(MERCURY_API, { url: articleUrl }, {
+        const response = await fetch(MERCURY_API, {
             method: 'POST',
             cache: "no-cache",
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: articleUrl })
         });
-        console.log("LOÖ");
-        console.log(articleUrl);
-        console.log(response);
         const data = await response.json();
         return data.content;
     } catch (error) {
