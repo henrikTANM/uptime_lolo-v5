@@ -97,7 +97,7 @@ button:active {
   margin-left: 10px;
 }
 
-#categoryFilter {
+.categoryFilter {
   border-color: #171238;
   border-width: 3px;
   border-radius: 3px;

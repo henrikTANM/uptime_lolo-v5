@@ -75,7 +75,7 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
                 <div className="filter">
                     <label style={{color: "#171238"}}>Filter by category:</label>
                     <select
-                        id="categoryFilter"
+                        className="categoryFilter"
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
                     >
