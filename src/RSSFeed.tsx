@@ -1,9 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react";
-
 import { fetchRSSFeed, fetchArticleContent} from "@/api";
-// @ts-ignore
 import Modal from "react-modal";
 
 // @ts-ignore
@@ -20,7 +18,6 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
     // fetch articles and set categories
     useEffect(() => {
         const getRSSFeed = async () => {
-            console.log(feedUrl);
             const items = await fetchRSSFeed(feedUrl);
             if (items.length > 0) {
                 // @ts-ignore
@@ -29,6 +26,7 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
             // @ts-ignore
             setArticles(items);
 
+            // make categories list for filtering
             const uniqueCategories = Array.from(
                 // @ts-ignore
                 new Set(items.flatMap(item => item.categories))
@@ -116,12 +114,10 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
                     </li>
                 ))}
             </ul>
-
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 contentLabel="Article Content"
-                scalable='true'
                 ariaHideApp={false}
             >
                 <button onClick={closeModal}>Close</button>

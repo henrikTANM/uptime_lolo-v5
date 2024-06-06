@@ -5,56 +5,62 @@ import RSSFeed from "@/RSSFeed";
 import DOMPurify from "dompurify";
 import {validateRSSFeed} from "@/api";
 // @ts-ignore
-export const dynamic = "force-dynamic";
+//export const dynamic = "force-dynamic";
 
 const DEFAULT_FEED = 'https://flipboard.com/@raimoseero/feed-nii8kd0sz.rss';
 
 export default function Home() {
-    // @ts-ignore
-    const storedFeeds = JSON.parse(sessionStorage.getItem('feeds')) || [];
-    const [feeds, setFeeds] = useState(storedFeeds);
+    const [feeds, setFeeds] = useState([]);
     const [newFeed, setNewFeed] = useState('');
 
-    // initialize default feed if session is open for the first time and is not changed
+    // mamage session storage
     useEffect(() => {
+        // @ts-ignore
+        const storedFeeds = JSON.parse(sessionStorage.getItem('feeds')) || [];
         const isInitialized = sessionStorage.getItem('isInitialized');
-        if (!isInitialized && storedFeeds.length === 0) {
+
+        if (!isInitialized) {
+            // Initialize with DEFAULT_FEED if it's a new session
             // @ts-ignore
             setFeeds([DEFAULT_FEED]);
             sessionStorage.setItem('feeds', JSON.stringify([DEFAULT_FEED]));
+            sessionStorage.setItem('isInitialized', 'true');
+        } else if (storedFeeds){
+            // Load the stored feeds
+            setFeeds(storedFeeds);
         }
-    }, [storedFeeds.length]);
+    }, []);
 
-    // handle feeds in session storage'
+
     useEffect(() => {
-        if (feeds.length === 0) {
-            sessionStorage.removeItem('feeds');
-        } else {
+        if (feeds.length > 0) {
             sessionStorage.setItem('feeds', JSON.stringify(feeds));
         }
     }, [feeds]);
 
-    // add feed
+    // add new feed
     const addFeed = async () => {
-        const goodRssURL = await validateRSSFeed(newFeed);
-        console.log(goodRssURL);
-        if (goodRssURL) {
-            const sanitizedFeed = DOMPurify.sanitize(newFeed);
-            // @ts-ignore
-            if (sanitizedFeed && !feeds.includes(sanitizedFeed)) {
+        // @ts-ignore
+        if (newFeed && !feeds.includes(newFeed)) {
+            const isValid = await validateRSSFeed(newFeed);
+            if (isValid) {
                 // @ts-ignore
-                setFeeds([sanitizedFeed, ...feeds]);
+                setFeeds([newFeed, ...feeds]);
                 setNewFeed('');
+            } else {
+                alert('Invalid RSS feed URL');
             }
         }
-        sessionStorage.setItem('isInitialized', 'true');
     };
 
-    // remove feed
+    //remove feed
     const removeFeed = (feed: any) => {
-        const updatedFeeds = feeds.filter((f: any) => f !== feed);
+        const updatedFeeds = feeds.filter(f => f !== feed);
         setFeeds(updatedFeeds);
-        sessionStorage.setItem('isInitialized', 'true');
+        sessionStorage.removeItem(`removedArticles_${feed}`);
+        if (updatedFeeds.length === 0) {
+            sessionStorage.removeItem('feeds');
+        }
     };
 
     return (
@@ -72,15 +78,17 @@ export default function Home() {
                     <button id="addFeedButton" onClick={addFeed}>Add Feed</button>
                 </div>
             </div>
-            {feeds.length === 0 ? (
-                <p style={{marginTop: '100px', marginLeft: '15px', color: '#171238'}}>Add a new feed to get started.</p>
-            ) : (
-                feeds.map((feed: any, index: Key | null | undefined) => (
-                    <div key={index} className="feedContainer">
-                        <RSSFeed feedUrl={feed} removeFeed={removeFeed}/>
-                    </div>
-                ))
-            )}
+            <div>
+                {feeds.length === 0 ? (
+                    <p style={{marginTop: '100px', marginLeft: '15px', color: '#171238'}}>Add a new feed to get started.</p>
+                ) : (
+                    feeds.map((feed: any, index: Key | null | undefined) => (
+                        <div key={index} className="feedContainer">
+                            <RSSFeed feedUrl={feed} removeFeed={removeFeed}/>
+                        </div>
+                    ))
+                )}
+            </div>
         </div>
     );
 };

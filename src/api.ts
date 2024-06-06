@@ -17,17 +17,25 @@ export const fetchRSSFeed = async (rssUrl: string) => {
         const feedTitle = channel.title;
         const items = channel.item;
 
-        // Create Array of articles with selected items from feed items
+        // Create an array of articles with selected items from feed items
         // @ts-ignore
         const articles = Array.from(items.map(item => {
             const imageUrl = item['media:content']?.['@_url'] || item.enclosure?.['@_url'] || '';
+
+            // Create an array of categories corresponding to the article
+            const categories = typeof item.category === 'string' ? [item.category] :
+                Object.values(item.category).map((item) => {
+                // @ts-ignore
+                    return item['#text'];
+                });
+
             return {
                 feedTitle: feedTitle,
                 title: item.title,
                 link: item.link,
                 description: item.description,
                 pubDate: new Date(item.pubDate),
-                categories: item.categories,
+                categories: categories,
                 imageUrl: imageUrl,
             };
         }));
