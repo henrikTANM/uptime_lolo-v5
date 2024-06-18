@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { fetchRSSFeed, fetchArticleContent} from "@/services/fetcher"
 import {useModal} from "@/hooks/useModal";
+import {Article} from "@/components/Article";
 
 // @ts-ignore
 const RSSFeed = ({ feedUrl, removeFeed }) => {
@@ -43,17 +44,17 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
     }, [removedArticles, feedUrl]);
 
     // @ts-ignore
-    const { modal, openModal, closeModal} = useModal({data: currentArticleData})
+    const { modal, showModal, closeModal} = useModal({data: currentArticleData})
 
     // open modal to view articles
-    const openModalUp = async (url: string) => {
-        openModal({ title: 'Loading...', author: '', date_published: '', lead_image_url: '', content: '', url: url})
+    const openModal = async (url: string) => {
+        showModal({ title: 'Loading...', author: '', date_published: '', lead_image_url: '', content: '', url: url})
         const data = await fetchArticleContent(url);
         if (data === "Failed to fetch content" || null) {
-            openModal({ title: "Could not fetch content", author: '', date_published: '', lead_image_url: '', content: '', url: url})
+            showModal({ title: "Could not fetch content", author: '', date_published: '', lead_image_url: '', content: '', url: url})
         } else {
             setCurrentArticleData(data);
-            openModal(data)
+            showModal(data)
         }
     };
 
@@ -74,46 +75,28 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
             <div className="feedHeader">
                 <h1 style={{color: "#171238"}}>{feedTitle}</h1>
                 <div className="filter">
-                    <label style={{color: "#171238"}}>Filter by Category:</label>
-                    <select
-                        className="categoryFilter"
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                    >
-                        <option value="">All</option>
-                        {categories.map((category, index) => (
-                            <option key={index} value={category}>
-                                {category}
-                            </option>
-                        ))}
-                    </select>
+                    <label style={{color: "#171238", fontWeight: "bold"}}>Filter by Category:</label>
+                    <div className="selectContainer">
+                        <select
+                            className="selectBox"
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                        >
+                            <option className="option" value="">All</option>
+                            {categories.map((category, index) => (
+                                <option className="option" key={index} value={category}>
+                                    {category}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
                 <button id="removeFeedButton" onClick={() => removeFeed(feedUrl)}>Remove Feed</button>
             </div>
             <ul>
                 {filteredItems.map((item, index) => (
                     <li key={index}>
-                        <div className="article">
-
-                            {// @ts-ignore
-                                item.imageUrl && <img className="articleImage" src={item.imageUrl} alt={item.title} onClick={
-                                    // @ts-ignore
-                                    () => openModalUp(item.link)}/>}
-                            <div className="articleContent">
-                                <div className="textContent">
-                                    <h4 className="articleTitle" onClick={// @ts-ignore
-                                        () => openModalUp(item.link)}>{item.title}</h4>
-                                    <p onClick={// @ts-ignore
-                                        () => openModalUp(item.link)} style={{cursor: 'pointer', color: "#171238"}}>{item.description}</p>
-                                </div>
-                                <div className="articleFooter">
-                                    <p><small>{// @ts-ignore
-                                        item.pubDate.toLocaleDateString()}</small></p>
-                                    <button onClick={// @ts-ignore
-                                        () => removeArticle(item.link)}>Remove</button>
-                                </div>
-                            </div>
-                        </div>
+                        <Article item={item} openModal={openModal} removeArticle={removeArticle}></Article>
                     </li>
                 ))}
             </ul>

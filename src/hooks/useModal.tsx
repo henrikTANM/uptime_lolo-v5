@@ -1,25 +1,23 @@
 "use client"
 
-import React, {ReactElement, ReactNode, useRef, useState} from "react";
+import React, {ReactNode, useRef, useState} from "react";
 import { Modal, ModalProps} from "@/components/Modal";
 
 const initialModalData = { title: '', author: '', date_published: '', lead_image_url: '', content: '', url: ''}
 
 export type UseModalResp = {
     modal: ReactNode
-    openModal: (data: typeof initialModalData) => void
+    showModal: (data: typeof initialModalData) => void
     closeModal: () => void
 }
 
 export type UseModalProps = Omit<ModalProps, 'onBackdropClick'> & {
-    shouldAllowBackdropClick?: boolean //if it is true then modal can be closed
-    onModalOpen?: () => void //this function will be called on calling of openModal
-    onModalClose?: () => void //this function will be called on calling of closeModal
+    onModalOpen?: () => void
+    onModalClose?: () => void
 }
 
 export const useModal = ({
     children,
-    shouldAllowBackdropClick = true,
     onModalClose,
     onModalOpen
 }: UseModalProps): UseModalResp => {
@@ -31,17 +29,14 @@ export const useModal = ({
         ref.current?.close()
     }
 
-    const openModal = (data: typeof initialModalData) => {
+    const showModal = (data: typeof initialModalData) => {
         setData(data)
         onModalOpen && onModalOpen()
         ref.current?.showModal()
     }
 
     const modal: ReactNode = (
-        <Modal onBackdropClick={() => {
-            if (shouldAllowBackdropClick) {
-                closeModal()
-            }
+        <Modal onBackdropClick={() => {closeModal()
         }} ref={ref}>
             <div className="modalHeader">
                 <button id="closeModal" onClick={() => {
@@ -55,8 +50,8 @@ export const useModal = ({
             <div className="modalContainer">
                 {data.lead_image_url && <img className="modalImage" src={data.lead_image_url} alt={""}/>}
                 <h1>{data.title}</h1>
-                <p>{data.author && "Author: " + data.author}</p>
-                <p>{data.date_published}</p>
+                <p>{data.author && data.author}</p>
+                <p>{data.date_published && data.date_published}</p>
                 <div className="modalContentContainer" dangerouslySetInnerHTML={{__html: data.content}}/>
             </div>
             {children}
@@ -65,7 +60,7 @@ export const useModal = ({
 
     return {
         closeModal,
-        openModal,
+        showModal,
         modal
     }
 }

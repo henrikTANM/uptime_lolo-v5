@@ -34,6 +34,7 @@ export const fetchRSSFeed = async (rssUrl: string) => {
                 title: item.title,
                 link: item.link,
                 description: item.description,
+                author: item.author,
                 pubDate: new Date(item.pubDate),
                 categories: categories,
                 imageUrl: imageUrl,

@@ -34,6 +34,7 @@ button:active {
 
 .menuBar {
   position: fixed;
+  z-index: 1;
   top: 0;
   width: 100%;
   display: flex;
@@ -55,6 +56,17 @@ button:active {
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+#rssInput {
+  width: 200px;
+  border-color: #FFBA75;
+  border-width: 3px;
+  border-radius: 3px;
+}
+
+#rssInput::placeholder {
+  color: #171238;
 }
 
 #addFeedButton {
@@ -102,11 +114,19 @@ button:active {
   flex-direction: row;
 }
 
-.categoryFilter {
-  border-color: #171238;
-  border-width: 3px;
-  border-radius: 3px;
+.selectContainer {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  min-width: 100px;
+  height: 20px;
   margin-left: 10px;
+}
+
+.selectBox {
+  border-color: #171238;
+  border-width: 2px;
+  border-radius: 2px;
 }
 
 .feedContainer {
@@ -177,10 +197,26 @@ li {
   align-items: center;
 }
 
+.articleImageAndCategoryContainer {
+  position: initial;
+}
+
 .articleImage {
   width: 100%;
   height: auto;
   cursor: pointer;
+}
+
+.articleCategory {
+  position: absolute;
+  margin: 5px;
+  padding: 10px;
+  width: fit-content;
+  background-color: #9381FF;
+  border-radius: 3px;
+  color: white;
+  font-weight: bold;
+  font-family: "Gill Sans MT", sans-serif;
 }
 
 dialog::backdrop {
