@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect, Key} from "react";
-import RSSFeed from "@/RSSFeed";
+import RSSFeed from "@/components/RSSFeed";
 import DOMPurify from "dompurify";
-import {validateRSSFeed} from "@/api";
+import {validateRSSFeed} from "@/services/fetcher";
 // @ts-ignore
 //export const dynamic = "force-dynamic";
 

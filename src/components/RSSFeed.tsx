@@ -1,8 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react";
-import { fetchRSSFeed, fetchArticleContent} from "@/api";
-import Modal from "react-modal";
+import { useState, useEffect } from "react"
+import { fetchRSSFeed, fetchArticleContent} from "@/services/fetcher"
+import {useModal} from "@/hooks/useModal";
+import {useFormatter} from "use-intl";
+import {Simulate} from "react-dom/test-utils";
+import keyUp = Simulate.keyUp;
 
 // @ts-ignore
 const RSSFeed = ({ feedUrl, removeFeed }) => {
@@ -11,8 +14,7 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
     const [selectedCategory, setSelectedCategory] = useState('');
     // @ts-ignore
     const [removedArticles, setRemovedArticles] = useState(JSON.parse(sessionStorage.getItem(`removedArticles_${feedUrl}`)) || []);
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [currentArticleContent, setCurrentArticleContent] = useState('');
+    const [currentArticleData, setCurrentArticleData] = useState({});
     const [feedTitle, setFeedTitle] = useState("Loading...");
 
     // fetch articles and set categories
@@ -44,16 +46,15 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
     }, [removedArticles, feedUrl]);
 
     // open modal to view articles
-    const openModal = async (url: string) => {
-        setModalIsOpen(true);
-        const content = await fetchArticleContent(url);
-        setCurrentArticleContent(content);
-    };
-
-    // close modal
-    const closeModal = () => {
-        setModalIsOpen(false);
-        setCurrentArticleContent('');
+    const openModalUp = async (url: string) => {
+        openModal({ title: 'Loading...', author: '', date_published: '', lead_image_url: '', content: '', url: url})
+        const data = await fetchArticleContent(url);
+        if (data === "Failed to fetch content") {
+            openModal({ title: data, author: '', date_published: '', lead_image_url: '', content: '', url: url})
+        } else {
+            setCurrentArticleData(data);
+            openModal(data)
+        }
     };
 
     // remove article
@@ -66,7 +67,10 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
         // @ts-ignore
         ? articles.filter(item => item.categories.includes(selectedCategory) && !removedArticles.includes(item.link))
         // @ts-ignore
-        : articles.filter(item => !removedArticles.includes(item.link));
+        : articles.filter(item => !removedArticles.includes(item.link))
+
+    // @ts-ignore
+    const { modal, openModal, closeModal} = useModal({data: currentArticleData})
 
     return (
         <div>
@@ -95,13 +99,15 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
                         <div className="article">
 
                             {// @ts-ignore
-                                item.imageUrl && <img className="articleImage" src={item.imageUrl} alt={item.title} onClick={() => openModal(item.link)}/>}
+                                item.imageUrl && <img className="articleImage" src={item.imageUrl} alt={item.title} onClick={
+                                    // @ts-ignore
+                                    () => openModalUp(item.link)}/>}
                             <div className="articleContent">
                                 <div className="textContent">
                                     <h4 className="articleTitle" onClick={// @ts-ignore
-                                        () => openModal(item.link)}>{item.title}</h4>
+                                        () => openModalUp(item.link)}>{item.title}</h4>
                                     <p onClick={// @ts-ignore
-                                        () => openModal(item.link)} style={{cursor: 'pointer', color: "#171238"}}>{item.description}</p>
+                                        () => openModalUp(item.link)} style={{cursor: 'pointer', color: "#171238"}}>{item.description}</p>
                                 </div>
                                 <div className="articleFooter">
                                     <p><small>{// @ts-ignore
@@ -114,16 +120,7 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
                     </li>
                 ))}
             </ul>
-            <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={closeModal}
-                contentLabel="Article Content"
-                ariaHideApp={false}
-            >
-                <button onClick={closeModal}>Close</button>
-                <div className="modalContent" dangerouslySetInnerHTML={{__html: currentArticleContent}}/>
-            </Modal>
-
+            {modal}
         </div>
     );
 };

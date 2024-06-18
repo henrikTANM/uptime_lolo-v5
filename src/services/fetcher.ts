@@ -76,7 +76,19 @@ export const fetchArticleContent = async (articleUrl: string) => {
             body: JSON.stringify({ url: articleUrl })
         });
         const data = await response.json();
-        return data.content;
+        if (data.error && data.error) {
+            return 'Failed to fetch content';
+        }
+        console.log(data);
+
+        return {
+            title: data.title,
+            author: data.author,
+            date_published: data.date_published,
+            lead_image_url: data.lead_image_url,
+            content: data.content,
+            url: data.url
+        }
     } catch (error) {
         console.error('Error fetching article content:', error);
         return 'Failed to fetch content';
