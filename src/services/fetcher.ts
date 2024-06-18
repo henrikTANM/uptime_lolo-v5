@@ -21,7 +21,6 @@ export const fetchRSSFeed = async (rssUrl: string) => {
         // @ts-ignore
         const articles = Array.from(items.map(item => {
             const imageUrl = item['media:content']?.['@_url'] || item.enclosure?.['@_url'] || '';
-            console.log(item.category)
             // Create an array of categories corresponding to the article
             const categories = (typeof item.category === 'string' && item.category.length > 0) ? [item.category] :
                 Object.values(item.category).map((item) => {
@@ -78,10 +77,10 @@ export const fetchArticleContent = async (articleUrl: string) => {
             body: JSON.stringify({ url: articleUrl })
         });
         const data = await response.json();
+        console.log(data)
         if (data.error && data.error) {
             return 'Failed to fetch content';
         }
-        console.log(data);
 
         return {
             title: data.title,

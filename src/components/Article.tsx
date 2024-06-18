@@ -7,27 +7,10 @@ import {useEffect, useState} from "react";
 // @ts-ignore
 export const Article = ({item, openModal, removeArticle}) => {
     const [isHovering, setIsHovering] = useState<boolean>(false)
-    /*
-    const [categories, setCategories] = useState("")
-
-    useEffect(() => {
-        item.categories && setCategories(item.categories[0])
-    }, [item]);
-
-    const onEnter = () => {
-        item.categories && setCategories(item.categories.join("; "))
-        console.log(categories)
-    }
-
-    const onExit = () => {
-        item.categories && setCategories(item.categories[0])
-    }
-    */
 
     const changeHovering = () => {
         setIsHovering(!isHovering)
     }
-    console.log(item.categories)
 
     // @ts-ignore
     return (
