@@ -2,7 +2,6 @@
 
 import React, {ReactElement, ReactNode, useRef, useState} from "react";
 import { Modal, ModalProps} from "@/components/Modal";
-import { useFormatter } from "use-intl";
 
 const initialModalData = { title: '', author: '', date_published: '', lead_image_url: '', content: '', url: ''}
 
@@ -56,7 +55,7 @@ export const useModal = ({
             <div className="modalContainer">
                 {data.lead_image_url && <img className="modalImage" src={data.lead_image_url} alt={""}/>}
                 <h1>{data.title}</h1>
-                <p>{data.author}</p>
+                <p>{data.author && "Author: " + data.author}</p>
                 <p>{data.date_published}</p>
                 <div className="modalContentContainer" dangerouslySetInnerHTML={{__html: data.content}}/>
             </div>

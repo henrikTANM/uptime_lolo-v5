@@ -1,8 +1,5 @@
 "use client"
 
-
-import React, { useRef, useState, useEffect } from 'react'
-
 import { forwardRef, ReactNode } from 'react'
 
 export type ModalProps = {

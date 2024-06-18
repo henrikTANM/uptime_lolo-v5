@@ -3,9 +3,6 @@
 import { useState, useEffect } from "react"
 import { fetchRSSFeed, fetchArticleContent} from "@/services/fetcher"
 import {useModal} from "@/hooks/useModal";
-import {useFormatter} from "use-intl";
-import {Simulate} from "react-dom/test-utils";
-import keyUp = Simulate.keyUp;
 
 // @ts-ignore
 const RSSFeed = ({ feedUrl, removeFeed }) => {
@@ -45,12 +42,15 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
         sessionStorage.setItem(`removedArticles_${feedUrl}`, JSON.stringify(removedArticles));
     }, [removedArticles, feedUrl]);
 
+    // @ts-ignore
+    const { modal, openModal, closeModal} = useModal({data: currentArticleData})
+
     // open modal to view articles
     const openModalUp = async (url: string) => {
         openModal({ title: 'Loading...', author: '', date_published: '', lead_image_url: '', content: '', url: url})
         const data = await fetchArticleContent(url);
-        if (data === "Failed to fetch content") {
-            openModal({ title: data, author: '', date_published: '', lead_image_url: '', content: '', url: url})
+        if (data === "Failed to fetch content" || null) {
+            openModal({ title: "Could not fetch content", author: '', date_published: '', lead_image_url: '', content: '', url: url})
         } else {
             setCurrentArticleData(data);
             openModal(data)
@@ -69,15 +69,12 @@ const RSSFeed = ({ feedUrl, removeFeed }) => {
         // @ts-ignore
         : articles.filter(item => !removedArticles.includes(item.link))
 
-    // @ts-ignore
-    const { modal, openModal, closeModal} = useModal({data: currentArticleData})
-
     return (
         <div>
             <div className="feedHeader">
                 <h1 style={{color: "#171238"}}>{feedTitle}</h1>
                 <div className="filter">
-                    <label style={{color: "#171238"}}>Filter by category:</label>
+                    <label style={{color: "#171238"}}>Filter by Category:</label>
                     <select
                         className="categoryFilter"
                         value={selectedCategory}

@@ -58,8 +58,8 @@ export const validateRSSFeed = async (rssUrl: string) => {
             method: "GET",
             cache: "no-cache"
         });
-        const json = Parser.parse(await response.text());
-        return json.rss ? true : false; // Check for RSS or Atom feeds
+        const data = Parser.parse(await response.text());
+        return data.rss ? true : false; // Check for RSS or Atom feeds
     } catch (error) {
         console.error('Error validating RSS feed:', error);
         return false;

@@ -4,8 +4,6 @@ import { useState, useEffect, Key} from "react";
 import RSSFeed from "@/components/RSSFeed";
 import DOMPurify from "dompurify";
 import {validateRSSFeed} from "@/services/fetcher";
-// @ts-ignore
-//export const dynamic = "force-dynamic";
 
 const DEFAULT_FEED = 'https://flipboard.com/@raimoseero/feed-nii8kd0sz.rss';
 
@@ -13,7 +11,7 @@ export default function Home() {
     const [feeds, setFeeds] = useState([]);
     const [newFeed, setNewFeed] = useState('');
 
-    // mamage session storage
+    // manage session storage
     useEffect(() => {
         // @ts-ignore
         const storedFeeds = JSON.parse(sessionStorage.getItem('feeds')) || [];
@@ -30,7 +28,6 @@ export default function Home() {
             setFeeds(storedFeeds);
         }
     }, []);
-
 
     useEffect(() => {
         if (feeds.length > 0) {
