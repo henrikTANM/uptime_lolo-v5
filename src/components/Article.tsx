@@ -3,9 +3,11 @@
 // @ts-ignore
 import {useEffect, useState} from "react";
 
+// Article component
 // @ts-ignore
 export const Article = ({item, openModal, removeArticle}) => {
-
+    const [isHovering, setIsHovering] = useState<boolean>(false)
+    /*
     const [categories, setCategories] = useState("")
 
     useEffect(() => {
@@ -20,11 +22,24 @@ export const Article = ({item, openModal, removeArticle}) => {
     const onExit = () => {
         item.categories && setCategories(item.categories[0])
     }
+    */
 
+    const changeHovering = () => {
+        setIsHovering(!isHovering)
+    }
+    console.log(item.categories)
+
+    // @ts-ignore
     return (
         <div className="article">
             <div className="articleImageAndCategoryContainer">
-                {categories !== "" && <p className="articleCategory" onMouseEnter={onEnter} onMouseLeave={onExit}>{categories && categories}</p>}
+                {item.categories.length !== 0 &&
+                    <div className="articleCategories" onMouseEnter={changeHovering} onMouseLeave={changeHovering}>{
+                        isHovering ?
+                            item.categories.map((category: string, key: number) => {
+                                return <div key={key}>{category}</div>
+                            }) : <div>{item.categories[0]}</div>
+                    }</div>}
                 {// @ts-ignore
                     item.imageUrl && <img className="articleImage" src={item.imageUrl} alt={item.title} onClick={
                         // @ts-ignore

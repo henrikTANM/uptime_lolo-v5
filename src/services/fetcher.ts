@@ -21,13 +21,14 @@ export const fetchRSSFeed = async (rssUrl: string) => {
         // @ts-ignore
         const articles = Array.from(items.map(item => {
             const imageUrl = item['media:content']?.['@_url'] || item.enclosure?.['@_url'] || '';
-
+            console.log(item.category)
             // Create an array of categories corresponding to the article
-            const categories = typeof item.category === 'string' ? [item.category] :
+            const categories = (typeof item.category === 'string' && item.category.length > 0) ? [item.category] :
                 Object.values(item.category).map((item) => {
                 // @ts-ignore
                     return item['#text'];
                 });
+
 
             return {
                 feedTitle: feedTitle,
@@ -67,7 +68,7 @@ export const validateRSSFeed = async (rssUrl: string) => {
     }
 };
 
-// Fetch cleaned content from article link using POST method
+// Fetch cleaned content from article url with MERCURY api using POST method
 export const fetchArticleContent = async (articleUrl: string) => {
     try {
         const response = await fetch(MERCURY_API, {

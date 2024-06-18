@@ -8,6 +8,7 @@ export type ModalProps = {
     onBackdropClick?: () => void
 }
 
+// Modal component
 // eslint-disable-next-line react/display-name
 export const Modal = forwardRef<HTMLDialogElement, ModalProps>(
     ({ children, onBackdropClick }, ref) => {

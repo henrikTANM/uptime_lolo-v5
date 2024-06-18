@@ -5,6 +5,7 @@ import { fetchRSSFeed, fetchArticleContent} from "@/services/fetcher"
 import {useModal} from "@/hooks/useModal";
 import {Article} from "@/components/Article";
 
+// RSSFeed component
 // @ts-ignore
 const RSSFeed = ({ feedUrl, removeFeed }) => {
     const [articles, setArticles] = useState([]);
